@@ -1,0 +1,18 @@
+<!-- 親となるテンプレートを継承 -->
+{% extends "layout.html" %}
+<!-- 親テンプレートのbody要素を書き変え　 -->
+{% block body %}
+<h2>売ります</h2>
+<!--  カテゴリ一覧の表示 -->
+<ul class="entries">
+    {% for category in categories %}
+        <!-- カテゴリが存在するとき -->
+        <li>
+            <b><a href="{{url_for('show_category_page',category_name=category.name)}}">{{ category.text }}</a></b>
+            {{safe }}<!-- |safe: jinja2自動エスケープ機能 -->
+    {% else %}
+        <!--  カテゴリが存在しない時 -->
+        <li><em>マジか！　カテゴリなんて無かったんだ…</em>
+    {% endfor %}
+</ul>
+{% endblock %}

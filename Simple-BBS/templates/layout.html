@@ -1,0 +1,23 @@
+<!-- 今回の親となるテンプレート -->
+<!doctype html>
+<title>Flaskr</title>
+<!-- 静的ファイルフォルダからCSSを読み込む -->
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<!-- html本体 -->
+<div class="page">
+    <h1>交換屋さん</h1>
+    <a href="{{ url_for('top_page') }}">top</a>
+    <!-- ログインログアウトの表示(session.logged_inキーを使って、ログインアウトの状態を判別) -->
+    <div class="metanav">
+        {% if not session.logged_in %}
+        <a href="{{ url_for('login') }}">ログイン</a>
+        {% else %}
+        <a href="{{ url_for('logout') }}">ログアウト</a>
+        {% endif %}
+    </div>
+    <!-- flashを使ったメッセージの表示 -->
+    {% for message in get_flashed_messages() %}
+    <div class="flash">{{ message }}</div>
+    {% endfor %}
+    {% block body %}{% endblock %}
+</div>
