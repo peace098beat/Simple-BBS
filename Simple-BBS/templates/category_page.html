@@ -6,12 +6,22 @@
 {% if session.logged_in %}
 <form action="{{ url_for('add_entry') }}" method="post" class="add-entry" enctype="multipart/form-data">
     <dl>
-        <dt>タイトル:
-        <dd><input name="title" type="text" size=30 >
-        <dt>画像:
-        <input type=file name="file">
-        <dt>本文:
-        <dd><textarea name="text" rows=5 cols=40></textarea>
+        <dt>タイトル・金額:</dt>
+        <dd><input name="title" type="text" size=30></dd>
+        <dt>本文:</dt>
+        <dd><textarea name="text" rows=5 cols=30 ></textarea></dd>
+        <dt>掲載画像:</dt>
+        <dd><input type="file" name="file" onchange="preview(this)" /></dd>
+        <dd><div id="preview_field"/></dd>
+        <dt>名前:</dt>
+        <dd><input name="username" type="text" size=30/></dd>
+        <dt>メールアドレス:</dt>
+        <dd><input name="mail" type="email" size=30/></dd>
+        <dt>削除パスワード:</dt>
+        <dd><input name="password" type="password" size=30/></dd>
+
+
+        <!-- 隠しパラメータ-->
         <dd><input name="category" type=hidden value="{{category.name}}">
         <dd><input type="submit" value="追加">
     </dl>
@@ -22,12 +32,15 @@
 <!-- エントリ一覧の表示 -->
 <ul class="entries">
     {% for entry in entries %}
-        <!-- エントリが存在するとき -->
-        <li><h2>{{ entry.title }}</h2>
-            {{ entry.text|safe }}<!-- |safe: jinja2自動エスケープ機能 -->
+    <!-- エントリが存在するとき -->
+    <li><h2>{{ entry.title }}</h2></li>
+    <li>{{ entry.timestamp }}</li>
+    <!-- フォルダ直打ちで適当。Pythonからグローバルな変数を使って呼び出せたらいいけど-->
+    <img src="{{ url_for('static', filename = 'updata/'+entry.imagename) }}"/>
+    {{ entry.text|safe }}<!-- |safe: jinja2自動エスケープ機能 -->
     {% else %}
-        <!-- エントリが存在しない時 -->
-        <li><em>マジか！　エントリーなんて無かったんだ…</em>
-    {% endfor %}
+    <!-- エントリが存在しない時 -->
+    <li><em>マジか！　エントリーなんて無かったんだ…</em>
+        {% endfor %}
 </ul>
 {% endblock %}
