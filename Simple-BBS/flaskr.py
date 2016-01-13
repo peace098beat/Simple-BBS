@@ -105,6 +105,8 @@ def init_db():
             db.cursor().executescript(f.read())
         db.commit()
 
+# テスト用DBの生成
+
 
 #
 # flaskは、DB処理の前後で別処理をするには以下のようなデコレータを利用することで可能になります。
