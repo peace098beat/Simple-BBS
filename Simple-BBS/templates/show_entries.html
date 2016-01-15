@@ -20,7 +20,7 @@
     {% for entry in entries %}
         <!-- エントリが存在するとき -->
         <li><h2>{{ entry.title }}</h2>
-            {{ entry.text|safe }}<!-- |safe: jinja2自動エスケープ機能 -->
+            <p>{{ entry.text|safe }}</p>><!-- |safe: jinja2自動エスケープ機能 -->
     {% else %}
         <!-- エントリが存在しない時 -->
         <li><em>マジか！　エントリーなんて無かったんだ…</em>

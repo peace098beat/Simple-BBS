@@ -34,10 +34,11 @@
     {% for entry in entries %}
     <!-- エントリが存在するとき -->
     <li><h2>{{ entry.title }}</h2></li>
-    <li>{{ entry.timestamp }}</li>
+    <li><a href="#">{{ entry.username }}</a> {{ entry.timestamp }}</li>
     <!-- フォルダ直打ちで適当。Pythonからグローバルな変数を使って呼び出せたらいいけど-->
-    <img src="{{ url_for('static', filename = 'updata/'+entry.imagename) }}"/>
-    {{ entry.text|safe }}<!-- |safe: jinja2自動エスケープ機能 -->
+    <!--<img src="{{ url_for('static', filename = 'updata/'+entry.imagename) }}"/>-->
+    <img src="{{ entry.imagename }}"/>
+    <p>{{ entry.text|safe }}</p><!-- |safe: jinja2自動エスケープ機能 -->
     {% else %}
     <!-- エントリが存在しない時 -->
     <li><em>マジか！　エントリーなんて無かったんだ…</em>

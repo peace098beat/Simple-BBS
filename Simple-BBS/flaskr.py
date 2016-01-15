@@ -12,14 +12,14 @@ app.run(debug=True) Trueにしてると、自動更新とエラー表示(たぶ�
 参考
 [Flaskで画像UPLOAD] https://github.com/peace098beat/flask-fileupload-sample
 
+(2016/01/14) ver0.3 スクレイピング機能追加
 (2016/01/13) ver0.2 画像の保存名をTimeStampに変更
 (2016/01/13) ver0.2 データベースの拡張
 (2016/01/13) ver0.2 UPLOAD画像のプレビュー機能追加
 (2016/01/12) ver0.1
 """
-__version__ = 0.2
+__version__ = 0.3
 __app_name__ = 'flaskr app'
-# TODO:沖縄宝島からデータをクロール
 
 # all the imports
 import os
@@ -42,10 +42,10 @@ PASSWORD = 'default'
 # サイトコンテンツ用の初期値
 # =========================
 # サイトのページを増やす場合に追加していく
-CATEGORIES = [dict(name="car", text=u"車"),
-              dict(name="accessories", text=u"アクセサリー"),
-              dict(name="audio", text=u"音楽・機材・楽器"),
-              dict(name="game", text=u"ゲーム／本体・ソフト/玩具")]
+CATEGORIES = [dict(name="car", text=u"売ります 車"),
+              dict(name="accessories", text=u"売ります アクセサリー"),
+              dict(name="audio", text=u"売ります 音楽・機材・楽器"),
+              dict(name="game", text=u"売ります ゲーム／本体・ソフト/玩具")]
 
 # データベースに保存されるキー
 # ============================
@@ -105,7 +105,6 @@ def init_db():
             db.cursor().executescript(f.read())
         db.commit()
 
-# テスト用DBの生成
 
 
 #
@@ -170,7 +169,7 @@ def top_page():
     # 念のためflushで通知
     flash(u'/top.htmlがひらかれました')
     # 取得したエントリを使ってhtmlをレンダリング
-    return render_template('top.html', categories=categories)
+    return render_template('top.html', categories=CATEGORIES)
 
 
 # エントリー追加
@@ -269,8 +268,51 @@ def logout():
     return redirect(url_for('top_page'))
 
 
+
+
+
+# テスト用DBの生成
+@app.route('/itdb')
+def init_test_db():
+    import mod.create_corpus_db as cdb
+    init_db()
+
+
+    def sub_scryping(url, category):
+        result_s = cdb.scry_okinawa_takarajima_categorypage(url)
+        print result_s
+        for result in result_s:
+            result['category'] = category
+            result['mail'] = 'a@a.a'
+            result['password'] = 'aaa'
+            g.db.execute(
+                'insert into entries_demo (category, title, text, imagename, username, mail, password) values (?,?,?,?,?,?,?)',
+                [result['category'], result['title'], result['text_body'], result['img_url'], result['user_name'],
+                 result['mail'], result['password']])
+        g.db.commit()
+
+    url = 'http://www.dgco.jp/furima/doncyaka20/index.html'
+    category = 'audio'
+    sub_scryping(url, category)
+
+    url = 'http://www.dgco.jp/furima/bike24/index.html'
+    category = 'car'
+    sub_scryping(url, category)
+
+    url = 'http://www.dgco.jp/furima/pc12/index.html'
+    category = 'accessories'
+    sub_scryping(url, category)
+    #
+    # url = 'http://www.dgco.jp/furima/b-parts25/index.html'
+    # category = 'game'
+    # sub_scryping(url, category)
+
+
+    return render_template('top.html', categories=CATEGORIES)
+
+
 if __name__ == '__main__':
     print __name__
-    init_db()
+    # init_db()
     # app.run(debug=False)
     app.run(debug=True)
