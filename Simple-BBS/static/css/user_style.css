@@ -1,0 +1,23 @@
+html{
+background-color:#fff;
+//width:80%;
+//margin:0 auto;
+ }
+
+.img-w200{
+    width:200px
+}
+.img-w300{
+    width:300px
+}
+.img-w400{
+    width:400px
+}
+
+.outline1{
+    outline: 1px solid #bbb;
+}
+
+#upload-form{
+    outline: 1px solid #bbb;
+}

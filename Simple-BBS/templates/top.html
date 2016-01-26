@@ -1,8 +1,23 @@
 <!-- 親となるテンプレートを継承 -->
 {% extends "layout.html" %}
+
+
+<!--ページヘッダ-->
+<!--継承用-->
+{% block header %}
+<div class="container">
+    <div class="page-header">
+        <h1>売ります  <small>欲しいものを安く手に入れよう！</small></h1>
+    </div>
+</div>
+{% endblock header %}
+
+
 <!-- 親テンプレートのbody要素を書き変え　 -->
-{% block body %}
-<h2>売ります</h2>
+{% block main %}
+<div class="container">
+
+<h3>売ります</h3>
 <!--  カテゴリ一覧の表示 -->
 <ul class="entries">
     {% for category in categories %}
@@ -15,4 +30,6 @@
         <li><em>マジか！　カテゴリなんて無かったんだ…</em>
     {% endfor %}
 </ul>
-{% endblock %}
+</div>
+<!--container-->
+{% endblock main %}

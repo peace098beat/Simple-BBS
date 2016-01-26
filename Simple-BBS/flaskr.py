@@ -12,14 +12,19 @@ app.run(debug=True) Trueにしてると、自動更新とエラー表示(たぶ�
 参考
 [Flaskで画像UPLOAD] https://github.com/peace098beat/flask-fileupload-sample
 
+(2016/01/14) ver0.4
 (2016/01/14) ver0.3 スクレイピング機能追加
 (2016/01/13) ver0.2 画像の保存名をTimeStampに変更
 (2016/01/13) ver0.2 データベースの拡張
 (2016/01/13) ver0.2 UPLOAD画像のプレビュー機能追加
 (2016/01/12) ver0.1
 """
-__version__ = 0.3
+__version__ = 0.4
 __app_name__ = 'flaskr app'
+
+# TODO:メール問い合わせページの追加
+# TODO:SNS連携
+# TODO:日付時間気温の追加
 
 # all the imports
 import os
@@ -29,8 +34,11 @@ from contextlib import closing
 # all the imports
 from flask import Flask, request, session, g, redirect
 from flask import url_for, abort, render_template, flash
+from flask_bootstrap import Bootstrap
+
 # アプリ生成
 app = Flask(__name__)
+Bootstrap(app)
 
 # 各種設定情報を記述
 DATABASE = 'flaskr.db'
@@ -38,6 +46,8 @@ DEBUG = True
 SECRET_KEY = 'development key'
 USERNAME = 'admin'
 PASSWORD = 'default'
+CSS_DEBUG = False
+TITLE = u'無題'
 
 # サイトコンテンツ用の初期値
 # =========================
@@ -54,7 +64,8 @@ CATEGORIES = [dict(name="car", text=u"売ります 車"),
 
 KEYS = ['id', 'category', 'title', 'text', 'imagename', 'username', 'mail', 'password', 'timestamp']
 CATEGORY_NUM = 1
-# 画像保存用user関数
+
+# 画像保存用user定数
 UPLOAD_FOLDER_NAME = 'updata'
 # TODO:サーバでの運用時には、ルートディレクトリを設定し直さなおす必要があるかもしれない
 PHISICAL_ROOT = os.path.abspath('./static')
@@ -76,7 +87,6 @@ def allowed_file(filename):
     else:
         print '> allowed_file is not image %s' % filename
     return result
-
 
 # app.config.from_object()
 # from_object() では、与えられたオブジェクトの内で 大文字の変数をすべて取得します。大変便利ですね。
@@ -104,7 +114,6 @@ def init_db():
         with app.open_resource('schema.sql') as f:
             db.cursor().executescript(f.read())
         db.commit()
-
 
 
 #
@@ -144,14 +153,13 @@ def show_category_page(category_name):
 
     # 複数のエントリの整形
     # TODO:カテゴリ別にDBから取得するSQLを作り、特定カテゴリだけデータを取得する.(とりあえずfor内のifで回避)
-    # entries = [dict(title=row[0], text=row[1], category=row[2]) for row in cur.fetchall() if row[2] == category_name]
     entries = [dict(zip(KEYS, row)) for row in cur.fetchall() if row[CATEGORY_NUM] == category_name]
-    print entries
+    # print entries
 
     # カテゴリを検索(category_nameが格納されている辞書を取得するため)
     for search_category in CATEGORIES:
         if search_category["name"] == category_name:
-            print category_name, search_category["name"], search_category["text"]
+            # print category_name, search_category["name"], search_category["text"]
             category = search_category
 
     # 念のためflushで通知
@@ -175,6 +183,11 @@ def top_page():
 # エントリー追加
 @app.route('/add', methods=['POST'])
 def add_entry():
+
+    print '>> add_entry ------------------'
+    print request.form
+    print request
+
     if not session.get('logged_in'):
         abort(401)
 
@@ -206,13 +219,28 @@ def add_entry():
             # 通知処理
             app.logger.info("Uploaded filename is saved in" + path)
 
+
+
     # SQLでクエリを保存
-    print request
+    # print reques
+    print u'SQL クエリ'
+    print request.form['category']
+    print request.form['text']
+    print request.form['title']
+    print request.form['username']
+    print request.form['mail']
+    print request.form['password']
+    print request.form['category'], request.form['text'], request.form['title'], save_filename, request.form['username'],
+    print request.form['mail'], request.form['password']
+
     g.db.execute(
         'insert into entries_demo (category, title, text, imagename, username, mail, password) values (?,?,?,?,?,?,?)',
         [request.form['category'], request.form['text'], request.form['title'], save_filename, request.form['username'],
          request.form['mail'], request.form['password']])
     g.db.commit()
+
+    print '<< add_entry end ------------------------'
+
 
     flash(u'%sをuploadしました' % f.filename)
     flash(u'新しいエントリーが追加されました')
@@ -268,18 +296,17 @@ def logout():
     return redirect(url_for('top_page'))
 
 
-
-
-
-# テスト用DBの生成
-@app.route('/itdb')
-def init_test_db():
+def _init_text_db():
     import mod.create_corpus_db as cdb
+
     init_db()
 
-
     def sub_scryping(url, category):
-        result_s = cdb.scry_okinawa_takarajima_categorypage(url)
+        try:
+            result_s = cdb.scry_okinawa_takarajima_categorypage(url)
+        except:
+            return False
+
         print result_s
         for result in result_s:
             result['category'] = category
@@ -298,17 +325,34 @@ def init_test_db():
     url = 'http://www.dgco.jp/furima/bike24/index.html'
     category = 'car'
     sub_scryping(url, category)
-
+    #
     url = 'http://www.dgco.jp/furima/pc12/index.html'
     category = 'accessories'
     sub_scryping(url, category)
     #
-    # url = 'http://www.dgco.jp/furima/b-parts25/index.html'
-    # category = 'game'
-    # sub_scryping(url, category)
+    url = 'http://www.dgco.jp/furima/b-parts25/index.html'
+    category = 'game'
+    sub_scryping(url, category)
 
 
+# テスト用DBの生成
+@app.route('/itdb')
+def init_test_db():
+    _init_text_db()
     return render_template('top.html', categories=CATEGORIES)
+
+
+# ==================================================================
+#
+# BootStrapテスト
+#
+# ==================================================================
+@app.route('/bs')
+def bootstrap_page():
+    return render_template('bootstrap-index.html', title=u'鹿児島大学')
+
+
+
 
 
 if __name__ == '__main__':

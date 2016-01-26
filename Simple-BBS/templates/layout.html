@@ -1,24 +1,140 @@
-<!-- 今回の親となるテンプレート -->
-<!doctype html>
-<title>Flaskr</title>
+<!-- flask-bootstrapモジュールのおまじない-->
+{% extends "bootstrap/base.html" %}
+
+<!-- タイトル -->
+{% block title %}
+{% if config.TITLE %}
+{{ config.TITLE }}
+{% else %}
+無題のタイトル
+{% endif %}
+{% endblock title %}
+
+
+<!-- IE9対応-->
+{% import "bootstrap/fixes.html" as fixes %}
+{% block head %}
+{{super()}}
+{{fixes.ie8()}}
+{% endblock %}
+
 <!-- 静的ファイルフォルダからCSSを読み込む -->
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-<script type="text/javascript" src="{{ url_for('static', filename='js/user-script.js') }}"></script>
-<!-- html本体 -->
-<div class="page">
-    <h1>交換屋さん</h1>
-    <a href="{{ url_for('top_page') }}">top</a>
-    <!-- ログインログアウトの表示(session.logged_inキーを使って、ログインアウトの状態を判別) -->
-    <div class="metanav">
-        {% if not session.logged_in %}
-        <a href="{{ url_for('login') }}">ログイン</a>
-        {% else %}
-        <a href="{{ url_for('logout') }}">ログアウト</a>
-        {% endif %}
+{%- block styles %}
+{{ super() }}
+<!-- userのスクリプト-->
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/user_style.css') }}">
+
+
+<!-- もしCSSデバックするなら-->
+{% if config.CSS_DEBUG %}
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/css_debug.css') }}">
+{% endif %}
+
+{%- endblock styles %}
+
+<!--ユーザスクリプトの追加-->
+{% block scripts %}
+<script src="{{url_for('static', filename='js/user_script.js')}}"></script>
+{{super()}}
+{% endblock %}
+
+
+<!--
+
+    navbar
+
+-->
+{% block navbar %}
+
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{{ url_for('top_page') }}">鹿児島大学フリーマーケット</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+            <form class="navbar-form navbar-left" role="search">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Search">
+                </div>
+                <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+
+            <ul class="nav navbar-nav navbar-right">
+                {% if not session.logged_in %}
+                <li><a href="{{ url_for('login') }}">ログイン</a></li>
+
+                    {% else %}
+                <li><a href="{{ url_for('logout') }}">ログアウト</a><</li>
+
+                {% endif %}
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
     </div>
+    <!-- /.container-fluid -->
+</nav>
+
+{%- endblock navbar %}
+
+<!--
+
+    content
+
+-->
+{% block content %}
+
+
+{% block flush %}
+<div class="container">
     <!-- flashを使ったメッセージの表示 -->
     {% for message in get_flashed_messages() %}
-    <div class="flash">{{ message }}</div>
+    <!--<div class="flash">{{ message }}</div>-->
+    <div class="alert alert-success" role="alert">{{ message }}</div>
     {% endfor %}
-    {% block body %}{% endblock %}
 </div>
+{% endblock flush %}
+
+
+<!--ページヘッダ-->
+<!--継承用-->
+{% block header %}{% endblock header %}
+
+<!-- メインコンテンツ -->
+{% block main %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-2">
+            <!-- 継承用-->
+            {% block left %}
+            {% endblock left %}
+        </div>
+        <div class="col-md-10">
+            <!-- 継承用-->
+            {% block right %}
+            {% endblock right %}
+        </div>
+    </div>
+</div>
+{% endblock main %}
+
+
+{% block footer %}
+<div class="container">
+    <p>©2016, <a href="http://fififactory.com/">FiFiFactory.</a></p>
+</div>
+{% endblock footer %}
+
+
+{% endblock　content %}

@@ -1,0 +1,81 @@
+<!-- flask-bootstrapモジュールのおまじない-->
+{% extends "bootstrap/base.html" %}
+
+<!-- タイトル -->
+{% block title %}
+{% if title %}
+{{ title }}
+{% else %}
+{{ config.TITLE
+{% endif %}
+{% endblock title %}
+
+<!-- IE9対応-->
+{% import "bootstrap/fixes.html" as fixes %}
+{% block head %}
+{{super()}}
+{{fixes.ie8()}}
+{% endblock %}
+
+<!-- 静的ファイルフォルダからCSSを読み込む -->
+{%- block styles %}
+{{ super() }}
+<!-- userのスクリプト-->
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/user_style.css') }}">
+
+<!-- もしCSSデバックするなら-->
+{% if config.CSS_DEBUG %}
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/css_debug.css') }}">
+{% endif %}
+
+{%- endblock styles %}
+
+{% block navbar %}
+
+
+<div class="navbar navbar-default">
+
+    <h1>{{ title }}</h1>
+
+    <!-- ログインログアウトの表示(session.logged_inキーを使って、ログインアウトの状態を判別) -->
+    <div>
+        {% if not session.logged_in %}
+        <a href="{{ url_for('login') }}">ログイン</a>
+        {% else %}
+        <a href="{{ url_for('logout') }}">ログアウト</a>
+        {% endif %}
+    </div>
+
+
+    <!-- flashを使ったメッセージの表示 -->
+    {% for message in get_flashed_messages() %}
+    <div class="flash">{{ message }}</div>
+    {% endfor %}
+
+</div>
+{%- endblock navbar %}
+
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            {% block left %}
+            {% endblock left %}
+        </div>
+        <div class="col-md-8">
+            {% block right %}
+            {% endblock right %}
+        </div>
+    </div>
+</div>
+
+
+{% block footer %}
+©2016, <a href="http://fififactory.com/">FiFiFactory.</a>
+{% endblock footer %}
+
+
+{% endblock　content %}
+
+

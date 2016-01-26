@@ -1,0 +1,39 @@
+@charset "utf-8";
+/* CSS Document */
+
+
+/* outlineを全要素で表示させる
+-----------------------------------------------------------------------------------*/
+body * { outline: 2px dotted rgba(255,0,0,1) !important; } /* red */
+body * * { outline: 2px dotted rgba(0,128,0,1) !important; } /* green */
+body * * * { outline: 2px dotted rgba(255,165,0,1) !important; } /* orange */
+body * * * * { outline: 2px dotted rgba(0,0,255,1) !important; } /* blue */
+body * * * * * { outline: 1px solid rgba(255,0,0,1) !important; } /* red */
+body * * * * * * { outline: 1px solid rgba(0,128,0,1) !important; } /* green */
+body * * * * * * * { outline: 1px solid rgba(255,165,0,1) !important; } /* orange */
+body * * * * * * * * { outline: 1px solid rgba(0,0,255,1) !important; } /* blue */
+/* 現在非推奨となっているタグを見つけるstyle直指定、fontタグ、centerタグ
+-----------------------------------------------------------------------------------*/
+*[style], font, center {outline: 5px solid rgba(255,0,0,1) !important; } /* red */
+/* 画像に対して推奨されているalt,titleの未設定を見つける
+-----------------------------------------------------------------------------------*/
+img[alt=''] {outline: 3px dotted rgba(255,0,0,1) !important; } /* red */
+img:not([alt]) {outline: 5px solid rgba(255,0,0,1) !important; } /* red */
+img[title=''] {outline: 3px dotted rgba(193,84,193,1);} /* fuchsia */
+img:not([title]) {outline: 5px solid rgba(193,84,193,1);} /* fuchsia */
+/* tableに対するsummaryの未定義を見つける
+-----------------------------------------------------------------------------------*/
+table[summary=''] {outline: 3px dotted rgba(255,0,0,1) !important; } /* red */
+table:not([summary]) {outline: 5px solid rgba(255,0,0,1) !important; } /* red */
+/* thタグのscope属性の未定義を見つける
+-----------------------------------------------------------------------------------*/
+th {outline: 2px solid red;}
+th[scope='col'], th[scope='row'] {outline: none;}
+th:not([scope='col']), th:not([scope='row']) {outline: 2px solid red;}
+/* リンク先の未定義と、title属性の未設定を発見する
+-----------------------------------------------------------------------------------*/
+a[href]:not([title]) {outline: 5px solid red;}
+a[title=''] {outline: 3px dotted rgba(255,0,0,1) !important; } /* red */
+a[href='#'] {background: lime;}
+a[href=''] {background: fuchsia;}
+

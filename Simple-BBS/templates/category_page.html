@@ -1,47 +1,133 @@
 <!-- 親となるテンプレートを継承 -->
 {% extends "layout.html" %}
+
+
+{% block header %}
+<div class="container">
+    <div class="page-header">
+        <h1>カテゴリ：{{category.text}}  <small>欲しいものを安く手に入れよう！</small></h1>
+    </div>
+</div>
+{% endblock header %}
+
 <!-- 親テンプレートのbody要素を書き変え　 -->
-{% block body %}
-<!-- ログイン中ならば追加要素を表示 -->
-{% if session.logged_in %}
-<form action="{{ url_for('add_entry') }}" method="post" class="add-entry" enctype="multipart/form-data">
-    <dl>
-        <dt>タイトル・金額:</dt>
-        <dd><input name="title" type="text" size=30></dd>
-        <dt>本文:</dt>
-        <dd><textarea name="text" rows=5 cols=30 ></textarea></dd>
-        <dt>掲載画像:</dt>
-        <dd><input type="file" name="file" onchange="preview(this)" /></dd>
-        <dd><div id="preview_field"/></dd>
-        <dt>名前:</dt>
-        <dd><input name="username" type="text" size=30/></dd>
-        <dt>メールアドレス:</dt>
-        <dd><input name="mail" type="email" size=30/></dd>
-        <dt>削除パスワード:</dt>
-        <dd><input name="password" type="password" size=30/></dd>
+{% block main %}
+<div class="container">
+
+    <div class="row">
+
+        <div class="col-xs-8 col-xs-offset-2 col-md-6 col-md-offset-3" id="upload-form">
+
+            <!-- ログイン中ならば追加要素を表示 -->
+            {% if session.logged_in %}
+
+            {% endif %}
+
+            <!-- フォーム画面-->
+            <form action="{{ url_for('add_entry') }}" method="post" enctype="multipart/form-data">
+                <!-- 商品名/金額-->
+                <div class="form-group">
+                    <label for="exampleInputName1">名前/金額</label>
+                    <input name="title" type="text" class="form-control" id="exampleInputName1"
+                           placeholder="○○トランシーバー　中古 5000円">
+                </div>
+
+                <!-- 本文 name=#text-->
+                <div class="form-group">
+                    <label for="exampleInputName2">名前/金額</label>
+            <textarea name="text" class="form-control" rows="5" id="exampleInputName2" placeholder="
+目立った傷・汚れ等はなく、利用にあたって支障はございません。
+有効画素数1220万画素、光学式3倍ズームレンズを搭載したモデル。
+※製品の詳細はこちらをご覧ください。
+fujifilm.jp/support/digitalcamera/download/pack/pdf/ff_finepixj30_mn_j101.pdf
+↑商品説明のメーカーHPです。
+
+・カメラ本体
+・純正充電池
+・充電器（社外品）
+・説明書
+・CD
+・ストラップ
+            "></textarea>
+                </div>
+
+                <!-- 名前-->
+                <div class="form-group">
+                    <label for="exampleInputName3">名前</label>
+                    <input name="username" type="text" class="form-control" id="exampleInputName3"
+                           placeholder="こびと">
+                </div>
+
+                <!-- E-mail-->
+                <div class="form-group">
+                    <label for="exampleInputEmail1">連絡用Email(非公開)</label>
+                    <input name="mail" type="mail" class="form-control" id="exampleInputEmail1" placeholder="Email">
+                </div>
+
+                <!-- 削除Password-->
+                <div class="form-group">
+                    <label for="exampleInputPassword1">削除用パスワード</label>
+                    <input name="password" type="password" class="form-control" id="exampleInputPassword1"
+                           placeholder="Password">
+                </div>
+
+                <!-- 掲載が像-->
+                <div class="form-group">
+                    <label for="exampleInputFile">File input</label>
+                    <input name="file" type="file" id="exampleInputFile" onchange="preview(this)">
+
+                    <div id="preview_field" class="help-block"></div>
+                </div>
+                <!-- 画像のプレビュー-->
+
+                <!-- 状態の保存-->
+                <div class="checkbox">
+                    <label><input name="save" type="checkbox">設定を保存する</label>
+                </div>
+
+                <!-- 隠しパラメータ-->
+                <input name="category" type=hidden value="{{category.name}}">
+
+                <!-- 送信ボタン-->
+                <!--<input type="submit" class="btn btn-default">送信</input>-->
+                <input type="submit" value="送信">
+            </form>
+
+        </div>
+        <!-- div upload-form -->
+    </div>
+    <!--row-->
+</div>
+<!--container-->
+
+<div class="container">
 
 
-        <!-- 隠しパラメータ-->
-        <dd><input name="category" type=hidden value="{{category.name}}">
-        <dd><input type="submit" value="追加">
-    </dl>
-</form>
-{% endif %}
-
-<h2>カテゴリ：{{category.text}}</h2>
-<!-- エントリ一覧の表示 -->
-<ul class="entries">
+    <h2>カテゴリ：{{category.text}}</h2>
     {% for entry in entries %}
-    <!-- エントリが存在するとき -->
-    <li><h2>{{ entry.title }}</h2></li>
-    <li><a href="#">{{ entry.username }}</a> {{ entry.timestamp }}</li>
-    <!-- フォルダ直打ちで適当。Pythonからグローバルな変数を使って呼び出せたらいいけど-->
-    <!--<img src="{{ url_for('static', filename = 'updata/'+entry.imagename) }}"/>-->
-    <img src="{{ entry.imagename }}"/>
-    <p>{{ entry.text|safe }}</p><!-- |safe: jinja2自動エスケープ機能 -->
+
+    <div class="media outline1">
+        {% if entry.imgname != '' %}
+        <div class="media-left">
+            <a href="#">
+                <img class="media-object img-w400" src="{{ entry.imagename }}" alt=""/>
+            </a>
+        </div>
+        {% endif %}
+
+        <div class="media-body ">
+            <h4 class="media-heading">{{ entry.title}}</h4>
+
+            <p><a href="#">{{ entry.username }}</a> {{entry.timestamp}}</p>
+            {{ entry.text | safe }}
+        </div>
+    </div>
+
     {% else %}
-    <!-- エントリが存在しない時 -->
-    <li><em>マジか！　エントリーなんて無かったんだ…</em>
-        {% endfor %}
-</ul>
-{% endblock %}
+
+    {% endfor %}
+
+
+</div>
+
+{% endblock main %}
